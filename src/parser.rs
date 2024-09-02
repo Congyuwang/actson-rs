@@ -564,6 +564,15 @@ where
         Ok(from_utf8(&self.current_buffer)?)
     }
 
+    /// Current partial string buffer.
+    pub fn current_str_buffer(&self) -> Option<&[u8]> {
+        if self.state == ST {
+            Some(&self.current_buffer)
+        } else {
+            None
+        }
+    }
+
     /// Get the value of the integer that has just been parsed. Call this
     /// function after you've received [`JsonEvent::ValueInt`](JsonEvent#variant.ValueInt).
     pub fn current_int<I>(&self) -> Result<I, InvalidIntValueError>

@@ -565,12 +565,17 @@ where
     }
 
     /// Current partial string buffer.
-    pub fn current_str_buffer(&self) -> Option<&[u8]> {
+    pub fn current_str_buffer(&mut self) -> Option<&mut Vec<u8>> {
         if self.state == ST {
-            Some(&self.current_buffer)
+            Some(&mut self.current_buffer)
         } else {
             None
         }
+    }
+
+    /// Current partial string buffer.
+    pub fn current_buffer(&mut self) -> &mut Vec<u8> {
+        &mut self.current_buffer
     }
 
     /// Get the value of the integer that has just been parsed. Call this

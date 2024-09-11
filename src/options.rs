@@ -8,6 +8,9 @@ pub struct JsonParserOptions {
     /// `true` if streaming mode should be enabled, which means that the parser
     /// will be able to handle a stream of multiple JSON values
     pub(super) streaming: bool,
+
+    /// The maximum buffer size
+    pub(super) max_buffer: Option<usize>,
 }
 
 /// A builder for [`JsonParserOptions`]
@@ -36,6 +39,7 @@ impl Default for JsonParserOptions {
         Self {
             max_depth: 2048,
             streaming: false,
+            max_buffer: None,
         }
     }
 }
@@ -50,6 +54,10 @@ impl JsonParserOptions {
     /// the parser will be able to handle a stream of multiple JSON values
     pub fn streaming(&self) -> bool {
         self.streaming
+    }
+
+    pub fn max_buffer(&self) -> Option<usize> {
+        self.max_buffer
     }
 }
 
@@ -116,6 +124,11 @@ impl JsonParserOptionsBuilder {
     /// ```
     pub fn with_streaming(mut self, streaming: bool) -> Self {
         self.options.streaming = streaming;
+        self
+    }
+
+    pub fn with_max_buffer(mut self, max_buffer: Option<usize>) -> Self {
+        self.options.max_buffer = max_buffer;
         self
     }
 

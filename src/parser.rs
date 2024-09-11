@@ -190,6 +190,10 @@ pub enum ParserError {
     /// too many times (i.e. after the end of a valid JSON text was reached).
     #[error("nothing more to parse")]
     NoMoreInput,
+
+    /// Buffer value exceeded.
+    #[error("value exceeded maximum")]
+    ValueTooLarge,
 }
 
 /// A non-blocking, event-based JSON parser.
@@ -225,6 +229,8 @@ pub struct JsonParser<T> {
     /// A character that has been put back to be parsed at the next call
     /// of [`Self::next_event()`]
     putback_character: Option<u8>,
+
+    max_buffer: Option<usize>,
 }
 
 impl<T> JsonParser<T>
@@ -244,6 +250,7 @@ where
             event2: JsonEvent::NeedMoreInput,
             parsed_bytes: 0,
             putback_character: None,
+            max_buffer: None,
         }
     }
 
@@ -262,6 +269,7 @@ where
             event2: JsonEvent::NeedMoreInput,
             parsed_bytes: 0,
             putback_character: None,
+            max_buffer: None,
         }
     }
 
@@ -279,6 +287,7 @@ where
             event2: JsonEvent::NeedMoreInput,
             parsed_bytes: 0,
             putback_character: None,
+            max_buffer: options.max_buffer,
         }
     }
 
@@ -349,6 +358,12 @@ where
                     } else {
                         Err(ParserError::NoMoreInput)
                     };
+                }
+                if self
+                    .max_buffer
+                    .is_some_and(|max| self.current_buffer.len() > max)
+                {
+                    return Err(ParserError::ValueTooLarge);
                 }
                 return Ok(Some(JsonEvent::NeedMoreInput));
             }
